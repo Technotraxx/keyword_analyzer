@@ -45,13 +45,14 @@ def plot_kde(df, column, title):
     st.pyplot(plt)
 
 def display_statistics(df):
+    numeric_df = df.select_dtypes(include=['float64', 'int64'])
     st.write("Summary Statistics:")
-    summary_stats = df.describe()
+    summary_stats = numeric_df.describe()
     st.dataframe(summary_stats)
     st.write("Standard Deviation:")
-    st.write(df.std())
+    st.write(numeric_df.std())
     st.write("Percentiles:")
-    st.write(df.quantile([0.25, 0.5, 0.75]))
+    st.write(numeric_df.quantile([0.25, 0.5, 0.75]))
 
 st.title('Keyword Cluster Analyzer')
 
