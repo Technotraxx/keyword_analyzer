@@ -28,6 +28,14 @@ def plot_top_keywords(df):
     plt.gca().invert_yaxis()
     st.pyplot(plt)
 
+def plot_distribution(df, column, title):
+    plt.figure(figsize=(10, 6))
+    plt.hist(df[column], bins=30, color='skyblue', edgecolor='black')
+    plt.title(title)
+    plt.xlabel(column)
+    plt.ylabel('Frequency')
+    st.pyplot(plt)
+
 st.title('Keyword Cluster Analyzer')
 
 uploaded_file = st.file_uploader("Upload XLS file", type=["xlsx"])
@@ -37,6 +45,22 @@ if uploaded_file:
     st.write("Data Loaded:")
     st.dataframe(df.head())
     st.write(f"Original DataFrame Shape: {df.shape}")
+
+    # Removing unnecessary columns for this analysis
+    df_keywords_cleaned = df.drop(columns=['Current URL', 'Updated'])
+
+    # Getting summary statistics
+    summary_stats = df_keywords_cleaned.describe()
+    st.write("Summary Statistics:")
+    st.dataframe(summary_stats)
+
+    # Visualizing distributions of key metrics
+    st.write("Distribution of Volume:")
+    plot_distribution(df_keywords_cleaned, 'Volume', 'Distribution of Volume')
+    st.write("Distribution of KD:")
+    plot_distribution(df_keywords_cleaned, 'KD', 'Distribution of KD')
+    st.write("Distribution of CPC:")
+    plot_distribution(df_keywords_cleaned, 'CPC', 'Distribution of CPC')
 
     cluster_input = st.text_area("Enter Keyword Cluster (comma-separated)")
     if cluster_input:
