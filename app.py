@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 def load_data(file):
     df = pd.read_excel(file, sheet_name='Keywords für kartons-zuschnitte')
@@ -28,13 +29,29 @@ def plot_top_keywords(df):
     plt.gca().invert_yaxis()
     st.pyplot(plt)
 
-def plot_distribution(df, column, title):
+def plot_boxplot(df, column, title):
     plt.figure(figsize=(10, 6))
-    plt.hist(df[column], bins=30, color='skyblue', edgecolor='black')
+    sns.boxplot(x=df[column], color='skyblue')
     plt.title(title)
     plt.xlabel(column)
-    plt.ylabel('Frequency')
     st.pyplot(plt)
+
+def plot_kde(df, column, title):
+    plt.figure(figsize=(10, 6))
+    sns.kdeplot(df[column], color='skyblue', shade=True)
+    plt.title(title)
+    plt.xlabel(column)
+    plt.ylabel('Density')
+    st.pyplot(plt)
+
+def display_statistics(df):
+    st.write("Summary Statistics:")
+    summary_stats = df.describe()
+    st.dataframe(summary_stats)
+    st.write("Standard Deviation:")
+    st.write(df.std())
+    st.write("Percentiles:")
+    st.write(df.quantile([0.25, 0.5, 0.75]))
 
 st.title('Keyword Cluster Analyzer')
 
@@ -49,18 +66,21 @@ if uploaded_file:
     # Removing unnecessary columns for this analysis
     df_keywords_cleaned = df.drop(columns=['Current URL', 'Updated'])
 
-    # Getting summary statistics
-    summary_stats = df_keywords_cleaned.describe()
-    st.write("Summary Statistics:")
-    st.dataframe(summary_stats)
+    # Display statistics
+    display_statistics(df_keywords_cleaned)
 
     # Visualizing distributions of key metrics
     st.write("Distribution of Volume:")
-    plot_distribution(df_keywords_cleaned, 'Volume', 'Distribution of Volume')
+    plot_boxplot(df_keywords_cleaned, 'Volume', 'Boxplot of Volume')
+    plot_kde(df_keywords_cleaned, 'Volume', 'KDE of Volume')
+
     st.write("Distribution of KD:")
-    plot_distribution(df_keywords_cleaned, 'KD', 'Distribution of KD')
+    plot_boxplot(df_keywords_cleaned, 'KD', 'Boxplot of KD')
+    plot_kde(df_keywords_cleaned, 'KD', 'KDE of KD')
+
     st.write("Distribution of CPC:")
-    plot_distribution(df_keywords_cleaned, 'CPC', 'Distribution of CPC')
+    plot_boxplot(df_keywords_cleaned, 'CPC', 'Boxplot of CPC')
+    plot_kde(df_keywords_cleaned, 'CPC', 'KDE of CPC')
 
     cluster_input = st.text_area("Enter Keyword Cluster (comma-separated)")
     if cluster_input:
