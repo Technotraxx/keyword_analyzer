@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import requests
+import http.client
+import json
 
 def load_data(file):
     df = pd.read_excel(file, sheet_name='Keywords für kartons-zuschnitte')
@@ -11,34 +12,37 @@ def load_data(file):
     return df
 
 def fetch_ahrefs_data(api_key, target_url):
-    url = "https://api.ahrefs.com/v3/site-explorer/organic-keywords"
-    params = {
-        "country": "de",
-        "date": "2024-06-14",
-        "limit": 100,
-        "mode": "prefix",
-        "order_by": "sum_traffic:desc",
-        "protocol": "both",
-        "select": "keyword,serp_features,volume,keyword_difficulty,cpc,sum_traffic,sum_paid_traffic,best_position,best_position_url,best_position_kind,best_position_has_thumbnail,best_position_has_video,serp_target_positions_count,last_update,language",
-        "target": target_url,
-        "volume_mode": "monthly"
-    }
+    conn = http.client.HTTPSConnection("api.ahrefs.com")
+    
     headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
+        'Accept': "application/json, application/xml",
+        'Authorization': f"Bearer {api_key}"
     }
     
-    response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()  # Raises an HTTPError for bad responses (4xx and 5xx)
-    return response.json()
+    params = (
+        "country=de&date=2024-06-14&limit=100&mode=prefix&order_by=sum_traffic:desc&"
+        "protocol=both&select=keyword,serp_features,volume,keyword_difficulty,cpc,sum_traffic,"
+        "sum_paid_traffic,best_position,best_position_url,best_position_kind,best_position_has_thumbnail,"
+        "best_position_has_video,serp_target_positions_count,last_update,language&"
+        f"target={target_url}&volume_mode=monthly"
+    )
+    
+    conn.request("GET", f"/v3/site-explorer/organic-keywords?{params}", headers=headers)
+    
+    res = conn.getresponse()
+    if res.status != 200:
+        raise Exception(f"API request failed with status {res.status}: {res.reason}")
+    
+    data = res.read()
+    return json.loads(data.decode("utf-8"))
 
 def filter_data(df, volume, kd, cpc, position_range):
     filtered_df = df[
         (df['Volume'] >= volume) & 
         (df['KD'] <= kd) & 
         (df['CPC'] >= cpc) &
-        (df['Current position'] >= position_range[0]) &
-        (df['Current position'] <= position_range[1])
+        (df['best_position'] >= position_range[0]) &
+        (df['best_position'] <= position_range[1])
     ]
     return filtered_df
 
@@ -94,6 +98,11 @@ if data_source == "Upload XLS file":
         st.write(f"Original DataFrame Shape: {df.shape}")
 elif data_source == "Fetch from Ahrefs API" and api_key and target_url:
     try:
+        # Debugging-Ausgabe
+        st.write("Fetching data from Ahrefs API...")
+        st.write(f"Target URL: {target_url}")
+        st.write("API Key Length:", len(api_key))
+
         data = fetch_ahrefs_data(api_key, target_url)
         df = pd.json_normalize(data['organic_keywords'])
         df.columns = df.columns.str.replace('keyword_difficulty', 'KD')
@@ -134,7 +143,7 @@ if 'df' in locals():
         st.write("Cleaned Cluster Length:", len(keywords_versanddienstleister_kartons))
         
         # Filtere den DataFrame basierend auf den bereinigten Keywords
-        cluster_df = df[df['Keyword'].isin(keywords_versanddienstleister_kartons)]
+        cluster_df = df[df['keyword'].isin(keywords_versanddienstleister_kartons)]
         
         with st.expander("Filtered DataFrame"):
             st.dataframe(cluster_df)
