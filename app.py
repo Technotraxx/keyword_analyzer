@@ -36,7 +36,7 @@ if uploaded_file:
 
     cluster_input = st.text_area("Enter Keyword Cluster (comma-separated)")
     if cluster_input:
-        keywords_versanddienstleister_kartons = [kw.strip() for kw.strip() in cluster_input.split(',')]
+        keywords_versanddienstleister_kartons = [kw.strip() for kw in cluster_input.split(',')]
         keywords_versanddienstleister_kartons = list(set(keywords_versanddienstleister_kartons))
         
         cluster_df = df[df['Keyword'].isin(keywords_versanddienstleister_kartons)]
