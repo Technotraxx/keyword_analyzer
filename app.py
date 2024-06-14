@@ -36,8 +36,16 @@ if uploaded_file:
 
     cluster_input = st.text_area("Enter Keyword Cluster (comma-separated)")
     if cluster_input:
+        # Debug: Zeige den gesamten Cluster-Input an
+        st.write("Cluster Input Length:", len(cluster_input))
+        st.write("Cluster Input Content:", cluster_input)
+        
         # Bereinigen und Duplikate entfernen
         keywords_versanddienstleister_kartons = list(set([kw.strip() for kw in cluster_input.split(',')]))
+        
+        # Debug: Zeige die Länge und den Inhalt der bereinigten Liste an
+        st.write("Cleaned Cluster Length:", len(keywords_versanddienstleister_kartons))
+        st.write("Cleaned Cluster Content:", keywords_versanddienstleister_kartons)
         
         # Filtere den DataFrame basierend auf den bereinigten Keywords
         cluster_df = df[df['Keyword'].isin(keywords_versanddienstleister_kartons)]
