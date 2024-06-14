@@ -8,11 +8,13 @@ def load_data(file):
     df['CPC'] = df['CPC'].fillna(0.0)  # Setze CPC auf 0.0, wenn es None oder leer ist
     return df
 
-def filter_data(df, volume, kd, cpc):
+def filter_data(df, volume, kd, cpc, position_range):
     filtered_df = df[
         (df['Volume'] >= volume) & 
         (df['KD'] <= kd) & 
-        (df['CPC'] >= cpc)
+        (df['CPC'] >= cpc) &
+        (df['Current position'] >= position_range[0]) &
+        (df['Current position'] <= position_range[1])
     ]
     return filtered_df
 
@@ -55,9 +57,10 @@ if uploaded_file:
         volume = st.slider("Minimum Volume", 0, int(df['Volume'].max()), 1000)
         kd = st.slider("Maximum KD", 0, 100, 20)
         cpc = st.slider("Minimum CPC", 0.0, float(df['CPC'].max()), 0.5)
+        position_range = st.slider("Current Position Range", 0, int(df['Current position'].max()), (0, 100))
 
         # Anwenden der Filter
-        filtered_df = filter_data(cluster_df, volume, kd, cpc)
+        filtered_df = filter_data(cluster_df, volume, kd, cpc, position_range)
         
         with st.expander("Filtered Cluster DataFrame"):
             st.dataframe(filtered_df)
