@@ -43,7 +43,8 @@ if uploaded_file:
         cluster_df = df[df['Keyword'].isin(keywords_versanddienstleister_kartons)]
         st.write("Filtered DataFrame:")
         st.dataframe(cluster_df.head())
-
+        st.write(f"Cluster DataFrame Shape: {cluster_df.shape}")
+        
         # Filteroptionen
         volume = st.slider("Minimum Volume", 0, int(df['Volume'].max()), 1000)
         kd = st.slider("Maximum KD", 0, 100, 20)
@@ -53,6 +54,7 @@ if uploaded_file:
         filtered_df = filter_data(cluster_df, volume, kd, cpc)
         st.write("Filtered Cluster DataFrame:")
         st.dataframe(filtered_df.head())
+        st.write(f"Filtered DataFrame Shape: {filtered_df.shape}")
 
         # Visualisierung
         st.write("Visualization:")
