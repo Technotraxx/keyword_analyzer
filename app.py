@@ -29,14 +29,22 @@ def plot_top_keywords(df):
     plt.gca().invert_yaxis()
     st.pyplot(plt)
 
-def plot_kde(df, column, title, log_scale=False):
+def plot_histogram(df, column, title, log_scale=False):
+    plt.figure(figsize=(10, 6))
+    plt.hist(df[column], bins=30, color='skyblue', edgecolor='black')
+    plt.title(title)
+    plt.xlabel(column)
+    plt.ylabel('Frequency')
+    if log_scale:
+        plt.yscale('log')
+    st.pyplot(plt)
+
+def plot_kde(df, column, title):
     plt.figure(figsize=(10, 6))
     sns.kdeplot(df[column], color='skyblue', shade=True)
     plt.title(title)
     plt.xlabel(column)
     plt.ylabel('Density')
-    if log_scale:
-        plt.yscale('log')
     st.pyplot(plt)
 
 def display_statistics(df):
@@ -63,7 +71,7 @@ if uploaded_file:
 
     # Visualizing distributions of key metrics
     st.write("Distribution of Volume:")
-    plot_kde(df_keywords_cleaned, 'Volume', 'KDE of Volume', log_scale=True)
+    plot_histogram(df_keywords_cleaned, 'Volume', 'Histogram of Volume', log_scale=True)
 
     st.write("Distribution of KD:")
     plot_kde(df_keywords_cleaned, 'KD', 'KDE of KD')
