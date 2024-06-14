@@ -33,6 +33,7 @@ if uploaded_file:
     df = load_data(uploaded_file)
     st.write("Data Loaded:")
     st.dataframe(df.head())
+    st.write(f"Original DataFrame Shape: {df.shape}")
 
     cluster_input = st.text_area("Enter Keyword Cluster (comma-separated)")
     if cluster_input:
@@ -63,6 +64,10 @@ if uploaded_file:
         st.write("Filtered Cluster DataFrame:")
         st.dataframe(filtered_df.head())
         st.write(f"Filtered DataFrame Shape: {filtered_df.shape}")
+
+        # Debug: Zeige detaillierte Informationen zum gefilterten DataFrame an
+        st.write("Filtered DataFrame Full Content:")
+        st.dataframe(filtered_df)
 
         # Visualisierung
         st.write("Visualization:")
