@@ -29,19 +29,14 @@ def plot_top_keywords(df):
     plt.gca().invert_yaxis()
     st.pyplot(plt)
 
-def plot_boxplot(df, column, title):
-    plt.figure(figsize=(10, 6))
-    sns.boxplot(x=df[column], color='skyblue')
-    plt.title(title)
-    plt.xlabel(column)
-    st.pyplot(plt)
-
-def plot_kde(df, column, title):
+def plot_kde(df, column, title, log_scale=False):
     plt.figure(figsize=(10, 6))
     sns.kdeplot(df[column], color='skyblue', shade=True)
     plt.title(title)
     plt.xlabel(column)
     plt.ylabel('Density')
+    if log_scale:
+        plt.yscale('log')
     st.pyplot(plt)
 
 def display_statistics(df):
@@ -49,10 +44,6 @@ def display_statistics(df):
     st.write("Summary Statistics:")
     summary_stats = numeric_df.describe()
     st.dataframe(summary_stats)
-    st.write("Standard Deviation:")
-    st.write(numeric_df.std())
-    st.write("Percentiles:")
-    st.write(numeric_df.quantile([0.25, 0.5, 0.75]))
 
 st.title('Keyword Cluster Analyzer')
 
@@ -72,15 +63,12 @@ if uploaded_file:
 
     # Visualizing distributions of key metrics
     st.write("Distribution of Volume:")
-    plot_boxplot(df_keywords_cleaned, 'Volume', 'Boxplot of Volume')
-    plot_kde(df_keywords_cleaned, 'Volume', 'KDE of Volume')
+    plot_kde(df_keywords_cleaned, 'Volume', 'KDE of Volume', log_scale=True)
 
     st.write("Distribution of KD:")
-    plot_boxplot(df_keywords_cleaned, 'KD', 'Boxplot of KD')
     plot_kde(df_keywords_cleaned, 'KD', 'KDE of KD')
 
     st.write("Distribution of CPC:")
-    plot_boxplot(df_keywords_cleaned, 'CPC', 'Boxplot of CPC')
     plot_kde(df_keywords_cleaned, 'CPC', 'KDE of CPC')
 
     cluster_input = st.text_area("Enter Keyword Cluster (comma-separated)")
