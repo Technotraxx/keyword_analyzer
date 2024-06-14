@@ -51,7 +51,7 @@ if uploaded_file:
         # Filtere den DataFrame basierend auf den bereinigten Keywords
         cluster_df = df[df['Keyword'].isin(keywords_versanddienstleister_kartons)]
         st.write("Filtered DataFrame:")
-        st.dataframe(cluster_df.head())
+        st.dataframe(cluster_df)
         st.write(f"Cluster DataFrame Shape: {cluster_df.shape}")
         
         # Filteroptionen
@@ -62,7 +62,7 @@ if uploaded_file:
         # Anwenden der Filter
         filtered_df = filter_data(cluster_df, volume, kd, cpc)
         st.write("Filtered Cluster DataFrame:")
-        st.dataframe(filtered_df.head())
+        st.dataframe(filtered_df)
         st.write(f"Filtered DataFrame Shape: {filtered_df.shape}")
 
         # Debug: Zeige detaillierte Informationen zum gefilterten DataFrame an
