@@ -36,20 +36,24 @@ if uploaded_file:
 
     cluster_input = st.text_area("Enter Keyword Cluster (comma-separated)")
     if cluster_input:
-        keywords_versanddienstleister_kartons = [kw.strip() for kw in cluster_input.split(',')]
-        keywords_versanddienstleister_kartons = list(set(keywords_versanddienstleister_kartons))
+        # Bereinigen und Duplikate entfernen
+        keywords_versanddienstleister_kartons = list(set([kw.strip() for kw in cluster_input.split(',')]))
         
+        # Filtere den DataFrame basierend auf den bereinigten Keywords
         cluster_df = df[df['Keyword'].isin(keywords_versanddienstleister_kartons)]
         st.write("Filtered DataFrame:")
         st.dataframe(cluster_df.head())
 
+        # Filteroptionen
         volume = st.slider("Minimum Volume", 0, int(df['Volume'].max()), 1000)
         kd = st.slider("Maximum KD", 0, 100, 20)
         cpc = st.slider("Minimum CPC", 0.0, float(df['CPC'].max()), 0.5)
 
+        # Anwenden der Filter
         filtered_df = filter_data(cluster_df, volume, kd, cpc)
         st.write("Filtered Cluster DataFrame:")
         st.dataframe(filtered_df.head())
 
+        # Visualisierung
         st.write("Visualization:")
         plot_top_keywords(filtered_df)
