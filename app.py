@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 def load_data(file):
     df = pd.read_excel(file, sheet_name='Keywords für kartons-zuschnitte')
     df['CPC'] = pd.to_numeric(df['CPC'], errors='coerce')
+    df['CPC'] = df['CPC'].fillna(0.0)  # Setze CPC auf 0.0, wenn es None oder leer ist
     return df
 
 def filter_data(df, volume, kd, cpc):
@@ -37,16 +38,11 @@ if uploaded_file:
 
     cluster_input = st.text_area("Enter Keyword Cluster (comma-separated)")
     if cluster_input:
-        # Debug: Zeige den gesamten Cluster-Input an
-        st.write("Cluster Input Length:", len(cluster_input))
-        st.write("Cluster Input Content:", cluster_input)
-        
         # Bereinigen und Duplikate entfernen
         keywords_versanddienstleister_kartons = list(set([kw.strip() for kw in cluster_input.split(',')]))
         
-        # Debug: Zeige die Länge und den Inhalt der bereinigten Liste an
+        # Debug: Zeige die Länge der bereinigten Liste an
         st.write("Cleaned Cluster Length:", len(keywords_versanddienstleister_kartons))
-        st.write("Cleaned Cluster Content:", keywords_versanddienstleister_kartons)
         
         # Filtere den DataFrame basierend auf den bereinigten Keywords
         cluster_df = df[df['Keyword'].isin(keywords_versanddienstleister_kartons)]
@@ -64,10 +60,6 @@ if uploaded_file:
         st.write("Filtered Cluster DataFrame:")
         st.dataframe(filtered_df)
         st.write(f"Filtered DataFrame Shape: {filtered_df.shape}")
-
-        # Debug: Zeige detaillierte Informationen zum gefilterten DataFrame an
-        st.write("Filtered DataFrame Full Content:")
-        st.dataframe(filtered_df)
 
         # Visualisierung
         st.write("Visualization:")
